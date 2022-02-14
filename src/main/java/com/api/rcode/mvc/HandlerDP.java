@@ -8,7 +8,10 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,6 +24,7 @@ public class HandlerDP {
 
     private final Method method;
     private final Object object;
+    private  List<InterceptorDP> interceptorList;
     private final Map<String,Parameter> parameterMap = new HashMap<>();
 
     public HandlerDP(Object object,String[] parameterName,Method method) {
@@ -64,8 +68,32 @@ public class HandlerDP {
         return method.invoke(object,args);
     }
 
+    public List<InterceptorDP> getInterceptorList() {
+        return interceptorList;
+    }
 
-    public Object  primitiveConvert(Class<?> type,String o){
+    public void preHandler(){
+        for (InterceptorDP interceptorDP : interceptorList) {
+            interceptorDP.preHandle();
+        }
+    }
+
+    public void postHandler(){
+        for (int i = interceptorList.size() - 1; i >= 0; i--) {
+            interceptorList.get(i).postHandle();
+        }
+    }
+
+
+    public void addInterceptorDP(InterceptorDP interceptorDP) {
+        if (this.interceptorList==null){
+            this.interceptorList = new ArrayList<>();
+        }
+        this.interceptorList.add(interceptorDP);
+        this.interceptorList.sort(Comparator.comparing(InterceptorDP::getOrder));
+    }
+
+    public Object  primitiveConvert(Class<?> type, String o){
         //基础类型判断
         boolean primitive = type.isPrimitive();
         if (primitive&&o==null){

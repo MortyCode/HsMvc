@@ -63,7 +63,7 @@ public class TomcatAPP {
 
         try {
             HandlerManger.init();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

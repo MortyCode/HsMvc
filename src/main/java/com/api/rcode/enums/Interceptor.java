@@ -15,5 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Interceptor {
 
-        String value() default "";
+        String[] value() default "";
+
+        int order() default 0;
 }

@@ -22,10 +22,13 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws  IOException {
-
         RequestFacade facadeReq = (RequestFacade) req;
+        dispatcher(facadeReq,resp);
+    }
 
-        String requestURI = req.getRequestURI();
+    private void dispatcher(RequestFacade facadeReq, HttpServletResponse resp) throws IOException {
+
+        String requestURI = facadeReq.getRequestURI();
         HandlerDP handlerDP = HandlerManger.getHandlerDP(requestURI);
         resp.setContentType("text/html;charset=UTF-8");
 
@@ -38,16 +41,17 @@ public class DispatcherServlet extends HttpServlet {
         Map<String, String[]> parameterMap = facadeReq.getParameterMap();
 
         try {
-            System.out.println("拦截器前面");
+
+            handlerDP.preHandler();
             Object invoke = handlerDP.invoke(parameterMap);
-            System.out.println("拦截器后面");
+            handlerDP.postHandler();
+
             resp.getWriter().println(invoke);
         } catch (Exception e) {
             resp.setStatus(502);
             e.printStackTrace();
             resp.getWriter().println("发送错误"+e.getMessage());
         }
-
     }
 
 }
